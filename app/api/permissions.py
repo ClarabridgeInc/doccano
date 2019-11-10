@@ -39,4 +39,4 @@ class IsOwnAnnotation(BasePermission):
         model = project.get_annotation_class()
         annotation = model.objects.filter(id=annotation_id, user=request.user)
 
-        return annotation.exists()
+        return annotation.exists() or request.user.is_superuser

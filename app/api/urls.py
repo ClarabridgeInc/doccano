@@ -7,7 +7,7 @@ from .views import ProjectList, ProjectDetail
 from .views import LabelList, LabelDetail, ApproveLabelsAPI
 from .views import DocumentList, DocumentDetail
 from .views import AnnotationList, AnnotationDetail
-from .views import TextUploadAPI, TextDownloadAPI, CloudUploadAPI
+from .views import TextUploadAPI, TextDownloadAPI, CloudUploadAPI, FileServerUpload
 from .views import StatisticsAPI
 
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('auth-token', obtain_auth_token),
     path('me', Me.as_view(), name='me'),
     path('features', Features.as_view(), name='features'),
+    path('fileserverupload', FileServerUpload.as_view(), name='fileserverupload'),
     path('cloud-upload', CloudUploadAPI.as_view(), name='cloud_uploader'),
     path('projects', ProjectList.as_view(), name='project_list'),
     path('projects/<int:project_id>', ProjectDetail.as_view(), name='project_detail'),

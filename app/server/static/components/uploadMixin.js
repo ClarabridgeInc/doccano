@@ -117,13 +117,7 @@ export default {
         },
         headers,
       }).then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'file.' + this.format); // or any other extension
-        document.body.appendChild(link);
         this.isLoading = false;
-        link.click();
       }).catch((error) => {
         this.isLoading = false;
         this.handleError(error);

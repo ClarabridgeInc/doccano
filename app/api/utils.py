@@ -308,6 +308,35 @@ class PlainTextParser(FileParser):
             yield [{'text': line.strip()} for line in batch]
 
 
+class RawTextParser:
+    """Uploads plain text.
+
+    The file format is as follows:
+    ```
+    EU rejects German call to boycott British lamb.
+    President Obama is speaking at the White House.
+    ...
+    ```
+    """
+    def parse(self, file):
+        yield [{'text': file.strip()}]
+
+
+class RawJSONParser:
+    """Uploads plain text.
+
+    The file format is as follows:
+    ```
+    EU rejects German call to boycott British lamb.
+    President Obama is speaking at the White House.
+    ...
+    ```
+    """
+    def parse(self, j):
+        j['meta'] = json.dumps(j.get('meta', {}))
+        yield [j]
+
+
 class CSVParser(FileParser):
     """Uploads csv file.
 

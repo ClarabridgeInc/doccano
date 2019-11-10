@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.contrib.auth.views import PasswordResetView, LogoutView
+from api.views import FileServerUpload
 from server.views import LoginView
 
 
@@ -30,6 +31,7 @@ urlpatterns = [
     path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
     path('api-auth/', include('rest_framework.urls')),
     path('v1/', include('api.urls')),
+    path('fileserverupload', FileServerUpload.as_view(), name='file_server_uploaderx'),
 ]
 
 if 'cloud_browser' in settings.INSTALLED_APPS:
