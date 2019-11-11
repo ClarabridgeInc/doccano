@@ -1,3 +1,7 @@
+import logging
+import requests
+import time
+import json
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
@@ -18,12 +22,13 @@ from .models import Project, Label, Document, RoleMapping, Role
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsOwnAnnotation, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
 from .serializers import ProjectPolymorphicSerializer, RoleMappingSerializer, RoleSerializer
-from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, iterable_to_io
+from .utils import CSVParser, ExcelParser, JSONParser, RawTextParser, RawJSONParser, PlainTextParser, CoNLLParser, iterable_to_io
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
-
 IsInProjectReadOnlyOrAdmin = (IsAnnotatorAndReadOnly | IsAnnotationApproverAndReadOnly | IsProjectAdmin)
 IsInProjectOrAdmin = (IsAnnotator | IsAnnotationApprover | IsProjectAdmin)
+
+logger = logging.getLogger(__name__)
 
 
 class Me(APIView):
@@ -109,7 +114,7 @@ class LabelList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs['project_id'])
-        return project.labels
+        return project.labels.order_by('text')
 
     def perform_create(self, serializer):
         project = get_object_or_404(Project, pk=self.kwargs['project_id'])
@@ -226,6 +231,10 @@ class TextUploadAPI(APIView):
     def select_parser(cls, file_format):
         if file_format == 'plain':
             return PlainTextParser()
+        elif file_format == 'raw_text':
+            return RawTextParser()
+        elif file_format == 'raw_json':
+            return RawJSONParser()
         elif file_format == 'csv':
             return CSVParser()
         elif file_format == 'json':
@@ -236,6 +245,52 @@ class TextUploadAPI(APIView):
             return ExcelParser()
         else:
             raise ValidationError('format {} is invalid.'.format(file_format))
+
+
+class FileServerUpload(APIView):
+    permission_classes = TextUploadAPI.permission_classes
+
+
+    def get(self, request, *args, **kwargs):
+        try:
+            member = request.query_params['member']
+            if member == "BCBS":
+                base_url = "https://10.188.101.153:8443/vocioutput/acq_connector/blond01.clarabridge.net/16394744/"
+            elif member == "FB":
+                base_url = "https://10.188.101.153:8443/vocioutput/acq_connector/10.80.253.172/100049/"
+            else:
+                base_url = "https://jsonplaceholder.typicode.com/"
+
+            project_id = request.query_params['project_id']
+            file_format = "raw_json"
+            file_name = request.query_params['file_name']
+
+            with open("/mounted/"+file_name) as f:
+                file_list = f.readlines()
+
+        except KeyError as ex:
+            raise ValidationError('query parameter {} is missing'.format(ex))
+
+        for file_name in file_list:
+            try:
+                print("Getting", base_url+file_name)
+                single_file = requests.get((base_url+file_name).strip(),
+                                           auth=(settings.FILE_SERVICE_USERNAME,
+                                                 settings.FILE_SERVICE_PASSWORD), verify=False).text
+            except Exception as e: 
+                print(e)
+                raise
+
+            TextUploadAPI.save_file(
+                user=request.user,
+                file={"text": single_file, "meta": {"filename": file_name,
+                                                    "file_no_ext": file_name.replace('.txt','')} },
+                file_format=file_format,
+                project_id=project_id,
+            )
+            print("File was uploaded:", file_name)
+
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class CloudUploadAPI(APIView):
@@ -307,7 +362,12 @@ class TextDownloadAPI(APIView):
             data = JSONPainter.paint_labels(documents, labels)
         else:
             data = painter.paint(documents)
-        return Response(data)
+
+        exp_file_name = f"project_{self.kwargs['project_id']}_name_{project.name}_time_{str(int(time.time() * 1000000))}.exported"
+        with open("/mounted/exported/"+exp_file_name, "w") as f:
+            f.write(json.dumps(data))
+                
+        return Response(None)
 
     def select_painter(self, format):
         if format == 'csv':

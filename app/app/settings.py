@@ -218,6 +218,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': env.int('DOCCANO_PAGE_SIZE', default=5),
@@ -278,7 +279,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # on the import phase
 IMPORT_BATCH_SIZE = env.int('IMPORT_BATCH_SIZE', 500)
 
-GOOGLE_TRACKING_ID = env('GOOGLE_TRACKING_ID', 'UA-125643874-2').strip()
+GOOGLE_TRACKING_ID = env('GOOGLE_TRACKING_ID', '').strip()
 
 AZURE_APPINSIGHTS_IKEY = env('AZURE_APPINSIGHTS_IKEY', None)
 APPLICATION_INSIGHTS = {
@@ -295,3 +296,7 @@ APPLICATION_INSIGHTS = {
 #
 ## During development only
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+FILE_SERVICE_USERNAME = env('FILE_SERVICE_USERNAME', '')
+FILE_SERVICE_PASSWORD = env('FILE_SERVICE_PASSWORD', '')

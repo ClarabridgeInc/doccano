@@ -1110,6 +1110,18 @@ class TestUploader(APITestCase):
 @override_settings(CLOUD_BROWSER_APACHE_LIBCLOUD_ACCOUNT=os.path.dirname(DATA_DIR))
 @override_settings(CLOUD_BROWSER_APACHE_LIBCLOUD_SECRET_KEY='not-used')
 class TestCloudUploader(TestUploader):
+
+    def file_upload_test_helper(self, project_id, filename, file_format, expected_status, **kwargs):
+        query_params = {
+
+        }
+
+        query_params.update(kwargs)
+
+        response = self.client.get(reverse('file_server_uploader'), query_params)
+
+        self.assertEqual(response.status_code, expected_status)
+
     def upload_test_helper(self, project_id, filename, file_format, expected_status, **kwargs):
         query_params = {
             'project_id': project_id,
@@ -1150,6 +1162,66 @@ class TestCloudUploader(TestUploader):
                                 expected_status=status.HTTP_302_FOUND)
 
     def test_can_upload_with_redirect_to_blank(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='example.jsonl',
+                                next='about:blank',
+                                file_format='json',
+                                expected_status=status.HTTP_201_CREATED)
+
+    def test_can_file_upload_with_redirect_to_blank(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='example.jsonl',
+                                next='about:blank',
+                                file_format='json',
+                                expected_status=status.HTTP_201_CREATED)
+
+
+class TestFileServerUploader(TestUploader):
+
+    def upload_test_helper(self, project_id, filename, file_format, expected_status, **kwargs):
+        query_params = {
+
+        }
+
+        query_params.update(kwargs)
+
+        response = self.client.get(reverse('file_server_uploader'), query_params)
+
+        self.assertEqual(response.status_code, expected_status)
+
+    def test_cannot_upload_with_missing_file(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='does-not-exist',
+                                file_format='json',
+                                expected_status=status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_upload_with_missing_container(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='example.jsonl',
+                                container='does-not-exist',
+                                file_format='json',
+                                expected_status=status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_upload_with_missing_query_parameters(self):
+        response = self.client.get(reverse('cloud_uploader'), {'project_id': self.classification_project.id})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_can_upload_with_redirect(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='example.jsonl',
+                                next='http://somewhere',
+                                file_format='json',
+                                expected_status=status.HTTP_302_FOUND)
+
+    def test_can_upload_with_redirect_to_blank(self):
+        self.upload_test_helper(project_id=self.classification_project.id,
+                                filename='example.jsonl',
+                                next='about:blank',
+                                file_format='json',
+                                expected_status=status.HTTP_201_CREATED)
+
+    def test_can_file_upload_with_redirect_to_blank(self):
         self.upload_test_helper(project_id=self.classification_project.id,
                                 filename='example.jsonl',
                                 next='about:blank',
