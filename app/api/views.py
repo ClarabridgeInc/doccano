@@ -2,6 +2,7 @@ import logging
 import requests
 import time
 import json
+from . import export_annotations
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
@@ -361,11 +362,17 @@ class TextDownloadAPI(APIView):
             labels = project.labels.all()
             data = JSONPainter.paint_labels(documents, labels)
         else:
+            labels = project.labels.all()
+            serializer_labels = LabelSerializer(labels, many=True)
+            labbel_mapper = {}
+            for x in serializer_labels.data:
+                labbel_mapper[x['id']] = x['text'] 
             data = painter.paint(documents)
 
         exp_file_name = f"project_{self.kwargs['project_id']}_name_{project.name}_time_{str(int(time.time() * 1000000))}.exported"
-        with open("/mounted/exported/"+exp_file_name, "w") as f:
+        with open(exp_file_name, "w") as f:
             f.write(json.dumps(data))
+        export_annotations.export_post_process(labbel_mapper, data,  project.name, self.kwargs['project_id'], str(int(time.time() * 1000000)))
                 
         return Response(None)
 
