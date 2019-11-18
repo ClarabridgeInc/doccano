@@ -370,7 +370,7 @@ class TextDownloadAPI(APIView):
             data = painter.paint(documents)
 
         exp_file_name = f"project_{self.kwargs['project_id']}_name_{project.name}_time_{str(int(time.time() * 1000000))}.exported"
-        with open(exp_file_name, "w") as f:
+        with open("/mounted/exported/" + exp_file_name, "w") as f:
             f.write(json.dumps(data))
         export_annotations.export_post_process(labbel_mapper, data,  project.name, self.kwargs['project_id'], str(int(time.time() * 1000000)))
                 
