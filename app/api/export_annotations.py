@@ -5,9 +5,10 @@ from collections import OrderedDict
 import difflib
 from copy import deepcopy
 from . import conversation_objects
-import logging
 
-#from conversation_objects import *
+import nltk
+from nltk.tokenize import sent_tokenize
+
 
 
 def conversation_parser(transcript_text):
@@ -46,11 +47,9 @@ def conversation_parser(transcript_text):
         elif t.startswith("CLIENT:"):
             t = t.replace('CLIENT: ','')
 
-        sentences = t.split('.')
-
+        sentences = sent_tokenize(t)
+    
         #Analysing at sentence level
-
-        sentences.pop()
         for sent in sentences:
             sentence_start = transcript_text.find(sent, turn_start, next_turn)
             sentence_end = transcript_text.find(sent,turn_start,next_turn)+len(sent) # for a dot and a space
@@ -126,21 +125,22 @@ def match_annotations_to_sentences(conversation, conv_annotations,transcript,lab
     return conversation, annotation_count
 
 def write_datafile(conversations):
-    filename = f"project_{conversations[0].project_id}_name_{conversations[0].project_name}_time_{conversations[0].export_time}.tsv"
+    filename = "export.tsv"
+    #filename = f"project_{conversations[0].project_id}_name_{conversations[0].project_name}_time_{conversations[0].export_time}.tsv"
     with open(filename, "w") as output_file:
         tsv_writer = csv.writer(output_file, delimiter='\t')
-        tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text', 'entire_annotation','phrase_annotated','label','annotation_id','user'])
-        #tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id','turn.start', 'turn_end', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text','sentence_start','sentence_end', 'entire_annotation','phrase_annotated','label','annotation_id','tag_start','tag_end','user'])
+        #tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text', 'entire_annotation','phrase_annotated','label','annotation_id','user'])
+        tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id','turn.start', 'turn_end', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text','sentence_start','sentence_end', 'entire_annotation','phrase_annotated','label','annotation_id','tag_start','tag_end','user'])
         for conversation in conversations:
             for turn in conversation.turn_mapper.items():
                 for sentence in turn[1].sentences: 
                     if(sentence.has_annotation == True):
                         for annotation in sentence.annotations:
-                            tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text, annotation.entire_annotation,annotation.sent_anno_intersection ,annotation.label,annotation.id,annotation.user])
-                            #tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].start,turn[1].end,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text, sentence.start, sentence.end,annotation.entire_annotation,annotation.sent_anno_intersection ,annotation.label,annotation.id, annotation.start, annotation.end,annotation.user])
+                            #tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text, annotation.entire_annotation,annotation.sent_anno_intersection ,annotation.label,annotation.id,annotation.user])
+                            tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].start,turn[1].end,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text, sentence.start, sentence.end,annotation.entire_annotation,annotation.sent_anno_intersection ,annotation.label,annotation.id, annotation.start, annotation.end,annotation.user])
                     else:
-                        tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text])
-                        #tsv_writer.writerow([conversation.project_id,conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].start,turn[1].end, turn[1].text, sentence.turn_sent_id, sentence.conv_sent_id, sentence.text, sentence.start, sentence.end])
+                        #tsv_writer.writerow([conversation.project_id, conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].text,sentence.turn_sent_id,sentence.conv_sent_id, sentence.text])
+                        tsv_writer.writerow([conversation.project_id,conversation.project_name, conversation.export_time, conversation.doccano_conv_id,conversation.filename,turn[1].speaker,turn[1].id,turn[1].start,turn[1].end, turn[1].text, sentence.turn_sent_id, sentence.conv_sent_id, sentence.text, sentence.start, sentence.end])
                     
                        
 
