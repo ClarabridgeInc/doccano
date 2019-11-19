@@ -100,6 +100,10 @@ def  link_annotation_to_sentence(annotation,conversation,turns_involved,transcri
                 continue
             if(sentence_involved.end < annotation.start):
                 continue
+            if (annotation.start == sentence_involved.end):
+                continue
+            if (annotation.end == sentence_involved.start):
+                continue
             else:
                 matching_text_sequences =difflib.SequenceMatcher(None, sentence_involved.text,transcript['text'][int(annotation.start):int(annotation.end)])
                 sub_start = matching_text_sequences.get_matching_blocks()[0].a
