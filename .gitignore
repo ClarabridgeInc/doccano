@@ -201,3 +201,5 @@ webpack-stats.json
 
 .vscode
 postgres-data
+annotation/*
+conversation/*

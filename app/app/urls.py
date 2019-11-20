@@ -31,7 +31,6 @@ urlpatterns = [
     path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
     path('api-auth/', include('rest_framework.urls')),
     path('v1/', include('api.urls')),
-    path('fileserverupload', FileServerUpload.as_view(), name='file_server_uploaderx'),
 ]
 
 if 'cloud_browser' in settings.INSTALLED_APPS:
