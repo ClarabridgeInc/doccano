@@ -1,0 +1,44 @@
+- model: api.label
+  pk: 1
+  fields:
+    text: Call Reason
+    prefix_key: null
+    suffix_key: null
+    project: 1
+    background_color: '#8127e7'
+    text_color: '#ffffff'
+    created_at: 2019-11-12 04:04:01.185176+00:00
+    updated_at: 2019-11-12 04:04:01.185219+00:00
+- model: api.label
+  pk: 2
+  fields:
+    text: Resolved Why?
+    prefix_key: null
+    suffix_key: null
+    project: 1
+    background_color: '#2ece9e'
+    text_color: '#000000'
+    created_at: 2019-11-12 04:04:24.085895+00:00
+    updated_at: 2019-11-12 04:04:24.085940+00:00
+- model: api.label
+  pk: 3
+  fields:
+    text: Unresolved Why?
+    prefix_key: null
+    suffix_key: null
+    project: 1
+    background_color: '#ef19f9'
+    text_color: '#ffffff'
+    created_at: 2019-11-12 04:04:29.479434+00:00
+    updated_at: 2019-11-12 04:04:29.479476+00:00
+- model: api.label
+  pk: 4
+  fields:
+    text: Pending Why?
+    prefix_key: null
+    suffix_key: null
+    project: 1
+    background_color: '#84a65c'
+    text_color: '#000000'
+    created_at: 2019-11-12 04:04:34.694982+00:00
+    updated_at: 2019-11-12 04:04:34.695020+00:00
