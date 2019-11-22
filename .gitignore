@@ -1,4 +1,4 @@
-# Created by .ignore support plugin (hsz.mobi)
+ # Created by .ignore support plugin (hsz.mobi)
 ### macOS template
 # General
 .DS_Store
@@ -203,3 +203,4 @@ webpack-stats.json
 postgres-data
 annotation/*
 conversation/*
+database/*

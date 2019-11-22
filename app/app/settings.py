@@ -185,7 +185,7 @@ ROLE_ANNOTATION_APPROVER = env('ROLE_ANNOTATION_APPROVER', 'annotation_approver'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': path.join(BASE_DIR, "..", "database", 'db.sqlite3'),
     }
 }
 

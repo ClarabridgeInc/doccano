@@ -29,6 +29,17 @@ def remove_all_role_mappings():
     RoleMapping.objects.all().delete()
 
 
+def remove_exported_files():
+    import os
+    folder = settings.ANNOTATION_ROOT
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(e)
+
 @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage')
 class TestProjectListAPI(APITestCase):
 
@@ -1165,6 +1176,7 @@ class TestCloudUploader(TestUploader):
                                 expected_status=status.HTTP_201_CREATED)
 
 
+@override_settings(CONVERSATION_ROOT=DATA_DIR)
 class TestFileServerUploader(TestUploader):
 
     def file_server_upload_test_helper(self, project_id, member, filename, expected_status, **kwargs):
@@ -1182,15 +1194,32 @@ class TestFileServerUploader(TestUploader):
 
     def test_cannot_upload_with_missing_file(self):
         self.file_server_upload_test_helper(project_id=self.classification_project.id,
-                                member='BCBS',
-                                filename='does-not-exist',
-                                expected_status=status.HTTP_400_BAD_REQUEST)
+                                            member='BCBS',
+                                            filename='does-not-exist',
+                                            expected_status=status.HTTP_400_BAD_REQUEST)
 
     def test_cannot_upload_with_missing_member(self):
         self.file_server_upload_test_helper(project_id=self.classification_project.id,
-                                filename='example.txt',
-                                member='does-not-exist',
-                                expected_status=status.HTTP_400_BAD_REQUEST)
+                                            filename='example.txt',
+                                            member='does-not-exist',
+                                            expected_status=status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_upload_with_missing_member(self):
+        query_params = {
+            'project_id': self.classification_project.id,
+            'member': 'does-not-exist',
+            'file_name': 'example.txt',
+        }
+        response = self.client.get(reverse('file_server_uploader'), query_params)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        query_params = {
+            'project_id': self.classification_project.id,
+            'base_url': 'http://jsonplaceholder.typicode.com/',
+            'file_name': 'example_ids.txt',
+        }
+        response = self.client.get(reverse('file_server_uploader'), query_params)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_cannot_upload_with_missing_query_parameters(self):
         response = self.client.get(reverse('file_server_uploader'), {'project_id': self.classification_project.id})
@@ -1200,6 +1229,8 @@ class TestFileServerUploader(TestUploader):
     @classmethod
     def doCleanups(cls):
         remove_all_role_mappings()
+        remove_exported_files()
+
 
 class TestFeatures(APITestCase):
     @classmethod

@@ -251,24 +251,29 @@ class TextUploadAPI(APIView):
 class FileServerUpload(APIView):
     permission_classes = TextUploadAPI.permission_classes
 
-
     def get(self, request, *args, **kwargs):
-        print("inside file server upload")
+
         try:
-            project_id = request.query_params['project_id']
             member = request.query_params['member']
             if member == "BCBS":
                 base_url = "https://10.188.101.153:8443/vocioutput/acq_connector/blond01.clarabridge.net/16394744/"
             elif member == "FB":
                 base_url = "https://10.188.101.153:8443/vocioutput/acq_connector/10.80.253.172/100049/"
             else:
-                raise KeyError('query parameter base_url value is not supported')
+                raise ValidationError('query parameter member value is not supported')
+        except KeyError as ex:
+            try:
+                base_url = request.query_params['base_url']
+            except KeyError as ex:
+                raise ValidationError('was not able to dervive base_url from base_url or member query parameter')
+            except MultiValueDictKeyError as ex:
+                raise ValidationError('was not able to dervive base_url from base_url or member query parameter')
 
+        try:
+            project_id = request.query_params['project_id']
             file_name = request.query_params['file_name']
-
             with open(path.join(settings.CONVERSATION_ROOT, file_name)) as f:
                 file_list = f.readlines()
-
         except KeyError as ex:
             raise ValidationError('query parameter {} is missing'.format(ex))
         except FileNotFoundError:
