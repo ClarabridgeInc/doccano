@@ -1,4 +1,4 @@
-# Created by .ignore support plugin (hsz.mobi)
+ # Created by .ignore support plugin (hsz.mobi)
 ### macOS template
 # General
 .DS_Store
@@ -201,3 +201,6 @@ webpack-stats.json
 
 .vscode
 postgres-data
+annotation/*
+conversation/*
+database/*

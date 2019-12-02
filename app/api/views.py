@@ -3,6 +3,7 @@ import requests
 import time
 import json
 from . import export_annotations
+from os import path
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
@@ -251,8 +252,8 @@ class TextUploadAPI(APIView):
 class FileServerUpload(APIView):
     permission_classes = TextUploadAPI.permission_classes
 
-
     def get(self, request, *args, **kwargs):
+
         try:
             member = request.query_params['member']
             if member == "BCBS":
@@ -260,36 +261,40 @@ class FileServerUpload(APIView):
             elif member == "FB":
                 base_url = "https://10.188.101.153:8443/vocioutput/acq_connector/10.80.253.172/100049/"
             else:
-                base_url = "https://jsonplaceholder.typicode.com/"
+                raise ValidationError('query parameter member value is not supported')
+        except KeyError as ex:
+            try:
+                base_url = request.query_params['base_url']
+            except KeyError as ex:
+                raise ValidationError('was not able to dervive base_url from base_url or member query parameter')
+            except MultiValueDictKeyError as ex:
+                raise ValidationError('was not able to dervive base_url from base_url or member query parameter')
 
+        try:
             project_id = request.query_params['project_id']
-            file_format = "raw_json"
             file_name = request.query_params['file_name']
-
-            with open("/mounted/"+file_name) as f:
+            with open(path.join(settings.CONVERSATION_ROOT, file_name)) as f:
                 file_list = f.readlines()
-
         except KeyError as ex:
             raise ValidationError('query parameter {} is missing'.format(ex))
+        except FileNotFoundError:
+            raise ValidationError('file {} does not exist'.format(file_name))
 
         for file_name in file_list:
             try:
-                print("Getting", base_url+file_name)
                 single_file = requests.get((base_url+file_name).strip(),
                                            auth=(settings.FILE_SERVICE_USERNAME,
                                                  settings.FILE_SERVICE_PASSWORD), verify=False).text
-            except Exception as e: 
-                print(e)
-                raise
-
+            except Exception as e:
+                raise ParseError("couldn't retrieve {} from file server".format(base_url+file_name))
+            
             TextUploadAPI.save_file(
                 user=request.user,
                 file={"text": single_file, "meta": {"filename": file_name,
                                                     "file_no_ext": file_name.replace('.txt','')} },
-                file_format=file_format,
+                file_format="raw_json",
                 project_id=project_id,
             )
-            print("File was uploaded:", file_name)
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -370,7 +375,7 @@ class TextDownloadAPI(APIView):
             data = painter.paint(documents)
 
         exp_file_name = f"project_{self.kwargs['project_id']}_name_{project.name}_time_{str(int(time.time() * 1000000))}.exported"
-        with open("/mounted/exported/" + exp_file_name, "w") as f:
+        with open(path.join(settings.ANNOTATION_ROOT, exp_file_name), "w") as f:
             f.write(json.dumps(data))
         export_annotations.export_post_process(labbel_mapper, data,  project.name, self.kwargs['project_id'], str(int(time.time() * 1000000)))
                 

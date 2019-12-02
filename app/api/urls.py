@@ -15,7 +15,7 @@ urlpatterns = [
     path('auth-token', obtain_auth_token),
     path('me', Me.as_view(), name='me'),
     path('features', Features.as_view(), name='features'),
-    path('fileserverupload', FileServerUpload.as_view(), name='fileserverupload'),
+    path('fileserverupload', FileServerUpload.as_view(), name='file_server_uploader'),
     path('cloud-upload', CloudUploadAPI.as_view(), name='cloud_uploader'),
     path('projects', ProjectList.as_view(), name='project_list'),
     path('users', Users.as_view(), name='user_list'),

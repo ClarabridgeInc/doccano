@@ -185,7 +185,7 @@ ROLE_ANNOTATION_APPROVER = env('ROLE_ANNOTATION_APPROVER', 'annotation_approver'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': path.join(BASE_DIR, "..", "database", 'db.sqlite3'),
     }
 }
 
@@ -297,6 +297,7 @@ APPLICATION_INSIGHTS = {
 ## During development only
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
-FILE_SERVICE_USERNAME = env('FILE_SERVICE_USERNAME', '')
-FILE_SERVICE_PASSWORD = env('FILE_SERVICE_PASSWORD', '')
+CONVERSATION_ROOT = path.join(BASE_DIR, "..", 'conversation')
+ANNOTATION_ROOT = path.join(BASE_DIR, "..", 'annotation')
+FILE_SERVICE_USERNAME = env('FILE_SERVICE_USERNAME', 'vocioutput')
+FILE_SERVICE_PASSWORD = env('FILE_SERVICE_PASSWORD', '65M3b57R94896q76')

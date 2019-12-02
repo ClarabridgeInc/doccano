@@ -116,7 +116,7 @@ export default {
           q: this.format,
         },
         headers,
-      }).then((response) => {
+      }).then(() => {
         this.isLoading = false;
       }).catch((error) => {
         this.isLoading = false;

@@ -20,6 +20,9 @@ RUN pip install -r /requirements.txt \
 COPY . /doccano
 
 WORKDIR /doccano
+
+RUN mkdir annotation && mkdir conversation && mkdir database
+
 RUN tools/ci.sh
 
 FROM builder AS cleaner
