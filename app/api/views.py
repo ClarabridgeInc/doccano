@@ -363,15 +363,14 @@ class TextDownloadAPI(APIView):
         # json1 format prints text labels while json format prints annotations with label ids
         # json1 format - "labels": [[0, 15, "PERSON"], ..]
         # json format - "annotations": [{"label": 5, "start_offset": 0, "end_offset": 2, "user": 1},..]
+        labels = project.labels.all()
+        serializer_labels = LabelSerializer(labels, many=True)
+        labbel_mapper = {}
+        for x in serializer_labels.data:
+            labbel_mapper[x['id']] = x['text'] 
         if format == "json1":
-            labels = project.labels.all()
             data = JSONPainter.paint_labels(documents, labels)
         else:
-            labels = project.labels.all()
-            serializer_labels = LabelSerializer(labels, many=True)
-            labbel_mapper = {}
-            for x in serializer_labels.data:
-                labbel_mapper[x['id']] = x['text'] 
             data = painter.paint(documents)
 
         exp_file_name = f"project_{self.kwargs['project_id']}_name_{project.name}_time_{str(int(time.time() * 1000000))}.exported"
