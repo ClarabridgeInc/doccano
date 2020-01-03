@@ -5,6 +5,8 @@ from collections import OrderedDict
 import difflib
 from copy import deepcopy
 from . import conversation_objects
+from os import path
+from django.conf import settings
 
 import nltk
 nltk.download('punkt')
@@ -132,7 +134,7 @@ def match_annotations_to_sentences(conversation, conv_annotations,transcript,lab
 def write_datafile(conversations):
     #filename = "export.tsv"
     filename = f"project_{conversations[0].project_id}_name_{conversations[0].project_name}_time_{conversations[0].export_time}.tsv"
-    with open("/mounted/exported/" + filename, "w") as output_file:
+    with open(path.join(settings.ANNOTATION_ROOT, filename), "w") as output_file:
         tsv_writer = csv.writer(output_file, delimiter='\t')
         tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text', 'entire_annotation','phrase_annotated','label','annotation_id','user'])
         #tsv_writer.writerow(['project_id','project_name','export_time','doccano_conv_id','conv_filename', 'speaker', 'turn_id','turn_start', 'turn_end', 'turn_text', 'turn_sentence_id','conv_sent_id','sentence_text','sentence_start','sentence_end', 'entire_annotation','phrase_annotated','label','annotation_id','tag_start','tag_end','user'])
