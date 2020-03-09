@@ -31,10 +31,8 @@ def conversation_parser(transcript_text):
         
         if t.startswith("AGENT:"):
             speaker = 'AGENT'
-            #t = t.replace('AGENT:','') 
         elif t.startswith("CLIENT:"):
             speaker = "CLIENT"
-            #t = t.replace('CLIENT:','')
         else:
             speaker = "UNKNOWN"
         
@@ -58,6 +56,8 @@ def conversation_parser(transcript_text):
             sentence_end = transcript_text.find(sent,turn_start,next_turn)+len(sent) # for a dot and a space
             sentence_length = len(sent)
             sentence_text = sent
+            if "---->>" in sent:
+                pass
             turn_sent_id += 1
             conv_sent_id += 1
 
