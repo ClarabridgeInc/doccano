@@ -84,6 +84,7 @@ export default {
       total: 0,
       remaining: 0,
       searchQuery: '',
+      documentId: '',
       url: '',
       offset: getOffsetFromUrl(window.location.href),
       picked: 'all',
@@ -188,7 +189,12 @@ export default {
 
     async submit() {
       const state = this.getState();
-      this.url = `docs?q=${this.searchQuery}&is_checked=${state}&offset=${this.offset}`;
+      if (this.documentId !== "") {
+        this.url = `docs?id=${this.documentId}`
+      } else {
+        this.url = `docs?q=${this.searchQuery}&is_checked=${state}&offset=${this.offset}`;
+      }
+      
       await this.search();
       this.pageNumber = 0;
     },
