@@ -64,7 +64,13 @@ export default {
 
     async submit() {
       const state = this.getState();
-      this.url = `docs?q=${this.searchQuery}&doc_annotations__isnull=${state}&offset=${this.offset}`;
+      if (this.documentId !== "") {
+        this.url = `docs/${this.documentId}`
+      } else if (this.metaFilter !== "") {
+        this.url = `docs?meta=${this.metaFilter}`
+      } else {
+        this.url = `docs?q=${this.searchQuery}&doc_annotations__isnull=${state}&offset=${this.offset}`;
+      }
       await this.search();
       this.pageNumber = 0;
     },

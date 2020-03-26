@@ -10,6 +10,14 @@ div.columns(v-cloak="")
           style="border-right: none; box-shadow: none; -webkit-box-shadow: none;"
         )
       div.main.pr20.pl20
+        input.input(
+          v-model="metaFilter"
+          v-on:keyup.enter="submit"
+          type="text"
+          placeholder="Meta Contains"
+          style="border-right: none; box-shadow: none; -webkit-box-shadow: none;"
+        )
+      div.main.pr20.pl20
         div.field.has-addons
           
           div.control.is-expanded

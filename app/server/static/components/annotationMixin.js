@@ -85,6 +85,7 @@ export default {
       remaining: 0,
       searchQuery: '',
       documentId: '',
+      metaFilter: '',
       url: '',
       offset: getOffsetFromUrl(window.location.href),
       picked: 'all',
@@ -191,6 +192,8 @@ export default {
       const state = this.getState();
       if (this.documentId !== "") {
         this.url = `docs?id=${this.documentId}`
+      } else if (this.metaFilter !== "") {
+        this.url = `docs?meta=${this.metaFilter}`
       } else {
         this.url = `docs?q=${this.searchQuery}&is_checked=${state}&offset=${this.offset}`;
       }

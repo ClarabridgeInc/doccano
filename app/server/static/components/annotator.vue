@@ -32,6 +32,10 @@ export default {
       type: String,
       default: '',
     },
+    metaFilter: {
+      type: String,
+      default: '',
+    },
     text: {
       type: String,
       default: '',

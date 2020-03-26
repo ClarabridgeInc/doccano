@@ -107,6 +107,8 @@ export default {
       const state = this.getState();
       if (this.documentId !== "") {
         this.url = `docs?id=${this.documentId}`
+      } else if (this.metaFilter !== "") {
+        this.url = `docs?meta=${this.metaFilter}`
       } else {
         this.url = `docs?q=${this.searchQuery}&seq2seq_annotations__isnull=${state}&offset=${this.offset}`;
       }

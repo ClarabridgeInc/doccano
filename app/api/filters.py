@@ -1,5 +1,7 @@
 from django.db.models import Count, Q
 from django_filters.rest_framework import FilterSet, BooleanFilter
+from django.db import models
+import django_filters
 
 from .models import Document
 
@@ -27,3 +29,10 @@ class DocumentFilter(FilterSet):
         fields = ('project','id', 'text', 'meta', 'created_at', 'updated_at',
                   'doc_annotations__label__id', 'seq_annotations__label__id',
                   'doc_annotations__isnull', 'seq_annotations__isnull', 'seq2seq_annotations__isnull')
+        
+        filter_overrides = {
+            models.TextField: {
+                'filter_class': django_filters.CharFilter,
+                'extra': lambda f: {'lookup_expr': 'icontains'},
+            },
+        }
