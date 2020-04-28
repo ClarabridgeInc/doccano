@@ -288,13 +288,16 @@ class FileServerUpload(APIView):
             except Exception as e:
                 raise ParseError("couldn't retrieve {} from file server".format(base_url+file_name))
             
-            TextUploadAPI.save_file(
-                user=request.user,
-                file={"text": single_file, "meta": {"filename": file_name,
-                                                    "file_no_ext": file_name.replace('.txt','')} },
-                file_format="raw_json",
-                project_id=project_id,
-            )
+            try:
+                TextUploadAPI.save_file(
+                    user=request.user,
+                    file={"text": single_file, "meta": {"filename": file_name,
+                                                        "file_no_ext": file_name.replace('.txt','')} },
+                    file_format="raw_json",
+                    project_id=project_id,
+                )
+            except Exception as e:
+                print(f"Failed uploading {file_name}")
 
         return Response(status=status.HTTP_201_CREATED)
 
