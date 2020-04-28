@@ -25,7 +25,7 @@ services:
     environment:
       WEBPACK_HOST: "0.0.0.0"
       WEBPACK_PORT: "8080"
-      WEBPACK_POLL_MILLIS: "1000"
+      WEBPACK_POLL_MILLIS: "100"
     ports:
       - 8080:8080
 
