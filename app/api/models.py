@@ -218,8 +218,8 @@ class DocumentAnnotation(Annotation):
 
 
 class SequenceAnnotation(Annotation):
-    document = models.ForeignKey(Document, related_name='seq_annotations', on_delete=models.CASCADE)
-    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, related_name='seq_annotations', on_delete=models.CASCADE, unique=False)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE, unique=False)
     start_offset = models.IntegerField()
     end_offset = models.IntegerField()
 
