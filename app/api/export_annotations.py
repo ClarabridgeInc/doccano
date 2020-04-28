@@ -32,7 +32,7 @@ def conversation_parser(transcript_text):
         if ((t.startswith("AGENT:")) or (t.startswith("agentverbatim:"))):
             speaker = 'AGENT'
             #t = t.replace('AGENT:','') 
-        elif(t.startswith("CLIENT:") or (t.startswith("clienttverbatim:"))):
+        elif(t.startswith("CLIENT:") or (t.startswith("clientverbatim:"))):
             speaker = "CLIENT"
             #t = t.replace('CLIENT:','')
         else:
@@ -47,8 +47,8 @@ def conversation_parser(transcript_text):
         if t.startswith("agentverbatim:"):
             t = t.replace('agentverbatim: ','') 
 
-        elif t.startswith("clienttverbatim:"):
-            t = t.replace('clienttverbatim: ','')
+        elif t.startswith("clientverbatim:"):
+            t = t.replace('clientverbatim: ','')
 
         elif t.startswith("AGENT:"):
             t = t.replace('AGENT: ','') 
