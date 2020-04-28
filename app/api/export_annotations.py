@@ -29,10 +29,10 @@ def conversation_parser(transcript_text):
         turn_sent_id = 0
         t = t.strip()
         
-        if t.startswith("AGENT:"):
+        if ((t.startswith("AGENT:")) or (t.startswith("agentverbatim:"))):
             speaker = 'AGENT'
             #t = t.replace('AGENT:','') 
-        elif t.startswith("CLIENT:"):
+        elif(t.startswith("CLIENT:") or (t.startswith("clienttverbatim:"))):
             speaker = "CLIENT"
             #t = t.replace('CLIENT:','')
         else:
@@ -44,7 +44,13 @@ def conversation_parser(transcript_text):
         turn_text = t 
         turn_length = len(t)
         
-        if t.startswith("AGENT:"):
+        if t.startswith("agentverbatim:"):
+            t = t.replace('agentverbatim: ','') 
+
+        elif t.startswith("clienttverbatim:"):
+            t = t.replace('clienttverbatim: ','')
+
+        elif t.startswith("AGENT:"):
             t = t.replace('AGENT: ','') 
 
         elif t.startswith("CLIENT:"):
