@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 from rest_framework.exceptions import ValidationError
-
-
+from django.db.models import Max
+import datetime
 from .models import Label, Project, Document, RoleMapping, Role
 from .models import TextClassificationProject, SequenceLabelingProject, Seq2seqProject
 from .models import DocumentAnnotation, SequenceAnnotation, Seq2seqAnnotation
@@ -86,6 +86,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     current_users_role = serializers.SerializerMethodField()
+    last_annotated = serializers.SerializerMethodField()
 
     def get_current_users_role(self, instance):
         role_abstractor = {
@@ -102,11 +103,21 @@ class ProjectSerializer(serializers.ModelSerializer):
                 role_abstractor[key] = users_role["role_id__name"] == val
         return role_abstractor
 
+    def get_last_annotated(self, instance):
+        project = instance
+        # get all documents for project
+        project.documents
+        model = instance.get_annotation_class()
+        serializer = instance.get_annotation_serializer()
+        # get all annotations for project then select max date
+        annotations = model.objects.filter(document=instance.id)
+        return annotations.aggregate(Max('updated_at'))["updated_at__max"]
+
     class Meta:
         model = Project
         fields = ('id', 'name', 'description', 'guideline', 'users', 'current_users_role', 'project_type', 'image',
-                  'updated_at', 'randomize_document_order', 'collaborative_annotation')
-        read_only_fields = ('image', 'updated_at', 'current_users_role')
+                  'updated_at', 'randomize_document_order', 'collaborative_annotation', 'last_annotated')
+        read_only_fields = ('image', 'updated_at', 'current_users_role', 'last_annotated')
 
 
 class TextClassificationProjectSerializer(ProjectSerializer):
@@ -124,8 +135,8 @@ class SequenceLabelingProjectSerializer(ProjectSerializer):
     class Meta:
         model = SequenceLabelingProject
         fields = ('id', 'name', 'description', 'guideline', 'users', 'current_users_role', 'project_type', 'image',
-                  'updated_at', 'randomize_document_order')
-        read_only_fields = ('image', 'updated_at', 'users', 'current_users_role')
+                  'updated_at', 'randomize_document_order', 'last_annotated')
+        read_only_fields = ('image', 'updated_at', 'users', 'current_users_role', 'last_annotated')
 
 
 class Seq2seqProjectSerializer(ProjectSerializer):

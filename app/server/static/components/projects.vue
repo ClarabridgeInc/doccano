@@ -116,8 +116,10 @@
 
                             div.dataset-item__main-subtitle {{ project.description }}
                             div.dataset-item__main-info
-                              span.dataset-item__main-update updated
-                                span {{ project.updated_at | daysAgo }}
+                              span.dataset-item__main-update updated 
+                                span {{ project.updated_at | daysAgo }} |
+                              span.dataset-item__main-update  annotated 
+                                span {{ project.last_annotated | daysAgo }}
 
                         td.is-vertical
                           span.tag.is-normal {{ project.project_type }}
